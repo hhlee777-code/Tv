@@ -51,56 +51,60 @@ KNOWN_APPS = {
     "disney": "3201901017640",
 }
 
-# Settings pass for a 2023 Samsung (S95C ships Tizen 7.0). Paths are the expected
-# locations on 2023 firmware; Samsung moves these between years and regions, so
-# every step says what to look for, not a key sequence to fire blind.
+# Settings pass for a 2023 Samsung such as the S95C. Paths marked "verified" were
+# confirmed on a 2023 Q70C (Tizen 8) by the Glass Home project
+# (github.com/victaphu/glass-home-samsung-tv, docs/SAMSUNG-SETTINGS.md); the rest are
+# expected locations. Every step says what to look for, never a key sequence to fire blind.
 CHECKLIST = [
     {
         "title": "Record your current values first",
         "path": "Take a photo of each screen below before changing it",
-        "action": "These photos are your undo. Nothing here has a factory 'restore' for privacy toggles.",
+        "action": "These photos are your undo; most toggles can be flipped back, PSID reset cannot.",
     },
     {
-        "title": "Viewing Information Services (ACR) -> Off",
-        "path": "Settings > All Settings > General & Privacy > Terms & Privacy",
-        "action": "Turn off Viewing Information Services. This is the content-recognition that "
-                  "fingerprints what is on screen, including HDMI inputs.",
+        "title": "Viewing Information Services (ACR) and Interest-Based Ads -> Off  [verified]",
+        "path": "Settings > Privacy Choices (left menu) > Terms & Conditions, Privacy Policy",
+        "action": "Untick Viewing Information Services and Interest-Based Advertisements, then move "
+                  "down to OK. Leave 'I agree to all' unticked. VIS fingerprints what is on screen, "
+                  "HDMI inputs included.",
     },
     {
-        "title": "Interest-Based Advertisement -> Off",
-        "path": "Settings > All Settings > General & Privacy > Terms & Privacy",
-        "action": "Turn off Interest-Based Advertisement.",
+        "title": "Reset the advertising ID (PSID)  [verified]",
+        "path": "Settings > All Settings > General & Privacy > Terms & Privacy > Reset PSID",
+        "action": "Reset, after turning ads off, so the old profile is orphaned. Cannot be undone; nothing depends on it.",
     },
     {
-        "title": "Reset the advertising ID (PSID)",
-        "path": "Settings > All Settings > General & Privacy > Terms & Privacy",
-        "action": "Use Reset PSID if offered, after turning ads off, so the old profile is orphaned.",
+        "title": "Samsung promotional pop-ups -> Off  [verified]",
+        "path": "Settings > Notification (just above All Settings) > gear icon",
+        "action": "Untick Samsung Promotion, then OK.",
     },
     {
-        "title": "Voice Recognition Services -> Off (if present)",
-        "path": "Settings > All Settings > General & Privacy > Terms & Privacy",
-        "action": "Turn off. Some regions/firmwares do not show this entry.",
+        "title": "Voice data -> Off (if present)  [unverified]",
+        "path": "Settings > All Settings > General & Privacy > Terms & Privacy / Voice",
+        "action": "Turn off Voice Recognition Services and Voice Wake-up if listed. Some firmwares show neither.",
     },
     {
-        "title": "Voice Wake-up -> Off (if present)",
-        "path": "Settings > All Settings > General & Privacy > Voice",
-        "action": "Turn off always-listening wake word. Push-to-talk on the remote still works.",
+        "title": "Don't open Smart Hub at power-on  [verified]",
+        "path": "Settings > All Settings > General & Privacy > Start Screen Options "
+                "(on Tizen 9 / One UI: Advanced Features > Start Screen Options)",
+        "action": "'Start with Smart Hub Home' off. With a home-screen app like Glass Home, also turn "
+                  "'Autorun Last App' on. The Home button still opens Samsung Home.",
+        "warn": "Factory data reset is the item just below Start Screen Options. Do not press OK there.",
     },
     {
-        "title": "Start screen behaviour",
-        "path": "Settings > All Settings > General & Privacy > Start Screen Option",
-        "action": "Optional: 'Start with Smart Hub Home' off and 'Autorun Last App' on boots into your "
-                  "last input/app instead of the ad-carrying home row. Also turn off any 'Autorun "
-                  "Samsung TV Plus' toggle. The Home button will still open Samsung Home.",
+        "title": "Mute Home-screen previews  [verified]",
+        "path": "Home > For You tab > scroll to the very bottom > Media Options > Autoplay Sound",
+        "action": "Press OK to switch autoplay sound off.",
     },
     {
-        "title": "Leave Software Update on",
+        "title": "Leave Software Update on  [unverified path]",
         "path": "Settings > Support > Software Update > Auto Update",
-        "action": "Keep ON. Firmware updates carry security fixes and can reset the toggles above, "
-                  "so re-run this pass after an update instead of freezing firmware.",
+        "action": "Keep ON. Updates carry security fixes and can reset the toggles above, so re-run "
+                  "this pass after one instead of freezing firmware.",
+        "warn": "Avoid Support > Device Care > Reset Smart Hub: it signs you out and removes downloaded apps.",
     },
     {
-        "title": "Remove this tool's pairing when done",
+        "title": "Remove this tool's pairing when done  [unverified path]",
         "path": "Settings > All Settings > Connection > External Device Manager > Device Connection Manager > Device List",
         "action": f"Delete '{CLIENT_NAME}' if you do not plan to use the remote again.",
     },
@@ -349,9 +353,11 @@ def cmd_app(a) -> None:
 
 
 def checklist_markdown() -> str:
-    out = ["# Samsung S95C privacy pass (2023, Tizen 7)", ""]
+    out = ["# Samsung S95C privacy pass (2023 models)", ""]
     for i, s in enumerate(CHECKLIST, 1):
         out += [f"{i}. **{s['title']}**", f"   - Where: {s['path']}", f"   - Do: {s['action']}"]
+        if s.get("warn"):
+            out.append(f"   - **Careful:** {s['warn']}")
     return "\n".join(out)
 
 
@@ -368,6 +374,8 @@ def cmd_guide(a) -> None:
         while True:
             s = CHECKLIST[i]
             print(f"\n[{i + 1}/{len(CHECKLIST)}] {s['title']}\n  where: {s['path']}\n  do:    {s['action']}")
+            if s.get("warn"):
+                print(f"  !! CAREFUL: {s['warn']}")
             while True:
                 cmd = input(f"  keys ({keys}) | n next | p prev | q quit > ").strip().lower()
                 if cmd in GUIDE_KEYS:

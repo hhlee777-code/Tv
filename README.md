@@ -19,6 +19,26 @@ and plug in an Android TV or Google TV box (such as an Nvidia Shield or Google T
 the original cleanyourtv on that box. The S95C's panel and picture processing work the same without
 a network connection. Everything below is for keeping the TV's own apps.
 
+## Your own home screen: Glass Home
+
+[Glass Home](https://github.com/victaphu/glass-home-samsung-tv) is a minimal home screen for
+Tizen TVs. It shows a photo backdrop and a dock of apps and HDMI inputs, and it doesn't track you.
+It's been reported working on Samsung TVs from 2018 to 2025, including a 2022 S95B and a 2023
+Q70C. That's as close to "my own OS" as a Samsung TV allows without unsupported hacks:
+
+- You install it in Developer Mode with a free Samsung certificate made for your TV's DUID (its
+  device ID). Expect about an hour the first time. Turn Developer Mode off afterwards.
+- The TV starts in Glass Home if you turn **Start with Smart Hub Home** off and **Autorun Last App**
+  on (step 6 of the settings pass). The Home button still opens Smart Hub.
+- A major Tizen upgrade (such as One UI Tizen) can delete sideloaded apps, so keep your build and
+  certificate files to reinstall it.
+- Its photo website runs over plain HTTP on port 8090. Set `photoService: false` if you don't want
+  that open on your network.
+
+Projects that change what the Home button opens (CleanFrame, Arn0) do it by rewriting undocumented
+settings. Each was tested on a single TV, and a firmware update can break them. Avoid them on a
+$2,000 panel unless you accept that risk.
+
 ## tools/tizen.py
 
 Needs Python 3.9 or newer and nothing else. The computer has to be on the same network as the TV.
@@ -41,8 +61,10 @@ and you press each key while watching the TV. It never sends OK unless you type 
 
 ## Status: untested on an S95C
 
-The menu locations are the expected ones for 2023 firmware (Tizen 7). Nobody has confirmed them on
-this exact TV. The WebSocket client has only been tested against a fake TV server, not a real set.
+Steps marked **[verified]** in the settings pass were confirmed on a 2023 Q70C (Tizen 8) by Glass
+Home. Nobody has confirmed any of them on an S95C. Glass Home's `tools/` folder has a similar remote
+(`tvremote.py`). It also has `phonecam.py`, which streams an iPhone camera pointed at the TV so a
+script can see the screen, the one thing this tool can't do. The WebSocket client has only been tested against a fake TV server, not a real set.
 If a step is wrong on your TV, correct `CHECKLIST` in `tools/tizen.py` and regenerate the doc:
 
 ```sh
@@ -54,8 +76,8 @@ python3 -m unittest discover -s tests
 
 - **Remove or disable Samsung's built-in apps.** Tizen has no equivalent of Android's
   `pm disable-user`.
-- **Replace the Home button.** Developer Mode lets you install a signed web app of your own, but the
-  Home button still opens Samsung Home. The reference project's
+- **Replace the Home button.** Glass Home gets close by opening at power-on, but the Home button
+  still opens Samsung Home. The reference project's
   [Tizen notes](https://github.com/Gathin23/cleanyourtv/blob/main/docs/devices/samsung-tizen.md)
   cover this.
 - **Remove ads inside YouTube, Netflix and similar apps.**

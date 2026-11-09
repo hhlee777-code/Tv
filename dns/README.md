@@ -1,9 +1,20 @@
 # DNS blocking for the S95C
 
-Set this up **on the router or a LAN resolver**, not on the TV. In the reference project's tests,
-a 2023 Samsung (CU7700) didn't keep a manual DNS server typed into **Network Status > IP Settings**.
-It reverted to automatic, and `samsungads.com` still loaded. The S95C is the same model year, so
-expect the same behavior until you confirm otherwise.
+There are two ways to do this. The evidence on setting DNS directly on the TV is mixed:
+
+- **On the TV (simplest).** On a 2023 Q70C, Glass Home set
+  **Settings > All Settings > Connection > Network > Network Status > IP Settings > DNS Setting >
+  Enter manually** to Control D's free "HaGeZi Light" filter (`76.76.2.37`, backup `76.76.10.37`).
+  The setting stayed, and YouTube, Netflix, Prime Video, Disney+ and Samsung TV Plus all still
+  worked. Use the on-screen keypad; number keys on the remote didn't fill the boxes. The catch: the
+  TV accepts only one DNS server, so if that service goes down, the TV has no internet. If that
+  happens, set DNS Setting back to **Get automatically** first.
+- **On the router or a LAN resolver (sturdier).** A 2023 CU7700 reverted a manual DNS server to
+  automatic, so blocking at the router also covers TVs that don't keep the setting. It also lets you
+  check the query log. The steps below use this route with `samsung-ads.txt`.
+
+After setting DNS on the TV, check that the setting stuck. Then check that `samsungads.com` no
+longer loads in the TV's browser.
 
 ## Setup
 
