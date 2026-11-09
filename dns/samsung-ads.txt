@@ -1,0 +1,16 @@
+! Samsung TV ad / content-recognition domains (conservative tier).
+! Format: Adblock-style, accepted by AdGuard Home and Pi-hole v6+ adlists.
+! Each rule also covers subdomains.
+!
+! Only domains whose purpose is ads or ACR by name are listed. Samsung's
+! samsungcloudsolution.* / samsungcloud.tv hosts mix telemetry with Smart Hub,
+! app store and firmware traffic, so they are NOT blocked wholesale here.
+! Grow this list from your own resolver's query log (see dns/README.md).
+!
+! Expected side effect: Samsung TV Plus (ad-supported) may stall or show gaps.
+! Not affected: ads inside YouTube, Netflix, Prime etc. (served from their own domains).
+
+||samsungads.com^
+||samsungadhub.com^
+||samsungacr.com^
+||samsungtifa.com^
